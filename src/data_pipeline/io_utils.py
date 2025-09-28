@@ -1,7 +1,9 @@
+from __future__ import annotations
+
+
 import pandas as pd
 from pathlib import Path
 from typing import Iterable
-from __future__ import annotations
 
 
 def _find_date_col(df: pd.DataFrame, candidates: Iterable[str]) -> str:

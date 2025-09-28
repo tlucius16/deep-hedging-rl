@@ -1,3 +1,4 @@
+from __future__ import annotations
 from pathlib import Path
 
 # project root assumed to be repo root when running scripts from there

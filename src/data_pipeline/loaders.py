@@ -35,6 +35,7 @@ def load_dataset(name: str) -> pd.Series:
         value_candidates=cfg["value_candidates"],
         freq=cfg.get("freq", "D"),
         rename_to=cfg["rename"]["value"],
+        skiprows=cfg.get("skiprows", 0),   # 👈 pick up from config
     )
 
 # ---- tables for options/vol ----

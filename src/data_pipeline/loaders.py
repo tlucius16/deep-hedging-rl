@@ -14,13 +14,15 @@ def load_timeseries_csv(
     value_candidates: list[str],
     freq: str = "D",
     rename_to: str | None = None,
+    skiprows: int = 0,
 ) -> pd.Series:
     raw = read_csv_flexible(
         path=Path(RAW_DIR) / file,
         date_cols=date_candidates,
         value_cols=value_candidates,
+        skiprows=skiprows,
     )
-    std = standardize_timeseries(raw)   # index=date, col=value
+    std = standardize_timeseries(raw)
     ser = std["value"]
     ser = resample_fill(ser, freq=freq, method="ffill")
     if rename_to:

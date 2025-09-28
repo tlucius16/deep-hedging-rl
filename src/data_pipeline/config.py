@@ -117,6 +117,7 @@ DATASETS.update({
         "value_candidates": ["Adj Close", "Close", "PX_LAST", "VALUE", "Price"],
         "rename": {"value": "close_spy"},
         "freq": "D",
+        "skiprows": 2,  # if needed, e.g. for header rows
     },
     "gspc": {
         "file": "GSPC_data.csv",
@@ -124,6 +125,7 @@ DATASETS.update({
         "value_candidates": ["Adj Close", "Close", "PX_LAST", "VALUE", "Price"],
         "rename": {"value": "close_gspc"},
         "freq": "D",
+        "skiprows": 2,  # if needed, e.g. for header rows
     },
     # keep vix, dgs10, etc. as before
 })

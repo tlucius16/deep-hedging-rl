@@ -110,3 +110,13 @@ def load_vol_surface() -> pd.DataFrame:
     for col in ["moneyness","tenor_d","iv"]:
         if col in out: out[col] = coerce_numeric(out[col])
     return out.dropna(subset=["date","iv"], how="any")
+
+# ---- simple wrappers for scalar time series ----
+def load_hvol():
+    """Historical realized vol series (rename in config as needed)."""
+    return load_dataset("hvol")
+
+def load_forward_prices():
+    """Forward price series."""
+    return load_dataset("fwd")
+

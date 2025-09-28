@@ -106,3 +106,22 @@ DATASETS.update({
         }
     },
 })
+
+DATASETS.update({
+    "spy": {
+        "file": "SPY_data.csv",
+        "date_candidates": ["Date", "DATE", "date", "Trade Date", "Unnamed: 0", "index"],
+        "value_candidates": ["Adj Close", "Close", "PX_LAST", "VALUE", "Price"],
+        "rename": {"value": "close_spy"},
+        "freq": "D",
+    },
+    "gspc": {
+        "file": "GSPC_data.csv",
+        "date_candidates": ["Date", "DATE", "date", "Trade Date", "Unnamed: 0", "index"],
+        "value_candidates": ["Adj Close", "Close", "PX_LAST", "VALUE", "Price"],
+        "rename": {"value": "close_gspc"},
+        "freq": "D",
+    },
+    # keep vix, dgs10, etc. as before
+})
+

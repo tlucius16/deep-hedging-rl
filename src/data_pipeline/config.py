@@ -17,6 +17,7 @@ DATASETS = {
         "value_candidates": ["Adj Close", "Close", "PX_LAST", "VALUE", "close"],
         "rename": {"value": "close_spy"},
         "freq": "D",
+        "skiprows": 2,  # if needed, e.g. for header rows
     },
     "gspc": {
         "file": "GSPC_data.csv",
@@ -24,6 +25,7 @@ DATASETS = {
         "value_candidates": ["Adj Close", "Close", "PX_LAST", "VALUE", "close"],
         "rename": {"value": "close_gspc"},
         "freq": "D",
+        "sikprows": 2,  # if needed, e.g. for header rows
     },
     "vix": {
         "file": "VIXCLS.csv",  # FRED usually

@@ -64,6 +64,7 @@ def read_csv_flexible(
     date_cols: Iterable[str],
     value_cols: Iterable[str],
     parse_first: bool = True,
+    skiprows: int = 0,
 ) -> pd.DataFrame:
     df = pd.read_csv(path)
     dcol = _find_date_col(df, date_cols)

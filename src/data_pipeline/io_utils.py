@@ -1,53 +1,63 @@
 from __future__ import annotations
 
 
+# io_utils.py
+
 import pandas as pd
 from pathlib import Path
 from typing import Iterable
 
+# ---------- helpers to detect columns ----------
+
+def pick_first(df: pd.DataFrame, candidates: Iterable[str]) -> str | None:
+    """Return the first existing column matching any of the candidate names (case-insensitive)."""
+    cmap = {str(c).lower(): c for c in df.columns}
+    for cand in candidates:
+        key = str(cand).lower()
+        if key in cmap:
+            return cmap[key]
+    return None
+
+def coerce_numeric(s: pd.Series) -> pd.Series:
+    return pd.to_numeric(s, errors="coerce")
 
 def _find_date_col(df: pd.DataFrame, candidates: Iterable[str]) -> str:
-    cols_map = {c.lower(): c for c in df.columns}
-    # 1) try explicit candidates
-    for c in candidates:
-        if c.lower() in cols_map:
-            return cols_map[c.lower()]
-    # 2) try unnamed first column
-    if df.columns[0] in ("", None) or str(df.columns[0]).startswith("Unnamed"):
+    # 1) explicit candidates
+    col = pick_first(df, candidates)
+    if col:
+        return col
+    # 2) unnamed/first column
+    first = df.columns[0]
+    if str(first).startswith("Unnamed"):
         try:
             pd.to_datetime(df.iloc[:, 0], errors="raise")
-            return df.columns[0]
+            return first
         except Exception:
             pass
-    # 3) try any column that parses mostly as datetime
+    # 3) any column that mostly parses as dates
     for c in df.columns:
-        s = pd.to_datetime(df[c], errors="coerce")
-        if s.notna().mean() > 0.9:
+        if pd.to_datetime(df[c], errors="coerce").notna().mean() > 0.9:
             return c
-    # 4) try index
-    if not isinstance(df.index, pd.DatetimeIndex):
-        # sometimes date is already the index but not parsed
-        idx = pd.to_datetime(df.index, errors="coerce")
-        if idx.notna().mean() > 0.9:
-            df.reset_index(inplace=True)
-            df.rename(columns={"index": "date"}, inplace=True)
-            return "date"
+    # 4) index might be the date
+    if isinstance(df.index, pd.DatetimeIndex):
+        df.reset_index(inplace=True)
+        df.rename(columns={"index": "date"}, inplace=True)
+        return "date"
     raise KeyError(f"No date-like column found. Columns: {list(df.columns)}")
 
 def _find_value_col(df: pd.DataFrame, candidates: Iterable[str]) -> str:
-    cols_map = {c.lower(): c for c in df.columns}
-    for c in candidates:
-        if c.lower() in cols_map:
-            return cols_map[c.lower()]
-    # fallback: prefer common price columns if present
-    for c in ["Adj Close", "Close", "PX_LAST", "Price"]:
-        if c in df.columns:
-            return c
-    # else pick the first numeric-looking column
+    col = pick_first(df, candidates)
+    if col:
+        return col
+    for fallback in ("Adj Close", "Close", "PX_LAST", "Price", "VALUE"):
+        if fallback in df.columns:
+            return fallback
     numcols = [c for c in df.columns if pd.api.types.is_numeric_dtype(df[c])]
     if numcols:
         return numcols[0]
     raise KeyError(f"No candidate value column found. Columns: {list(df.columns)}")
+
+# ---------- file IO ----------
 
 def read_csv_flexible(
     path: Path,
@@ -62,3 +72,11 @@ def read_csv_flexible(
     if parse_first:
         out["date"] = pd.to_datetime(out["date"], errors="coerce")
     return out
+
+def save_parquet(df: pd.DataFrame, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(path, index=True)
+
+def save_csv(df: pd.DataFrame, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(path, index=True)

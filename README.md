@@ -49,5 +49,6 @@ deep-hedging-rl/
 conda env create -f environment.yml
 conda activate deep-hedging-rl
 
-
+git lfs install && git lfs pull
 pip install -r requirements.txt
+python -m data_pipeline.cli all

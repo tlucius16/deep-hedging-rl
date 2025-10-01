@@ -81,3 +81,27 @@ def save_parquet(df: pd.DataFrame, path: Path) -> None:
 def save_csv(df: pd.DataFrame, path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     df.to_csv(path, index=True)
+
+# io_utils.py (append these)
+LFS_HEADER = "version https://git-lfs.github.com/spec/v1"
+
+def is_lfs_pointer(path: Path, sniff: int = 160) -> bool:
+    try:
+        if path.stat().st_size > 512:  # real files will be larger
+            return False
+        head = path.read_text(errors="ignore")[:sniff]
+        return LFS_HEADER in head
+    except Exception:
+        return False
+
+def ensure_materialized(path: Path):
+    if not path.exists():
+        raise FileNotFoundError(f"Missing file: {path}")
+    if is_lfs_pointer(path):
+        raise RuntimeError(
+            f"{path.name} looks like a Git LFS pointer.\n"
+            "Run:\n"
+            "  git lfs install\n"
+            "  git lfs pull\n"
+            "…then re-run."
+        )

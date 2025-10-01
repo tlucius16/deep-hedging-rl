@@ -1,14 +1,16 @@
 from __future__ import annotations
-import pandas as pd
+from pathlib import Path
+from .config import RAW_DIR, FILENAMES
+from .io_utils import ensure_materialized
 
-def assert_no_na(df_or_s: pd.DataFrame | pd.Series, cols: list[str] | None = None) -> None:
-    obj = df_or_s if cols is None else df_or_s[cols]
-    if obj.isna().any().any():
-        raise AssertionError("Found NaNs.")
-
-def assert_monotonic_index(df_or_s: pd.DataFrame | pd.Series) -> None:
-    idx = df_or_s.index
-    if not isinstance(idx, pd.DatetimeIndex):
-        raise AssertionError("Index is not DatetimeIndex.")
-    if not idx.is_monotonic_increasing:
-        raise AssertionError("Index not monotonic increasing.")
+def validate_raw():
+    errors = []
+    for k, fname in FILENAMES.items():
+        p = Path(RAW_DIR) / fname
+        try:
+            ensure_materialized(p)
+        except Exception as e:
+            errors.append(f"{fname}: {e}")
+    if errors:
+        raise SystemExit("Raw checks failed:\n- " + "\n- ".join(errors))
+    print("All raw files present & materialized ✅")

@@ -221,3 +221,4 @@ mlruns/
 
 # Allow small processed demo datasets
 !data/processed/
+!data/ProjectData/

@@ -12,7 +12,16 @@ from .builders import (
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("task", choices=["validate","market","options_spy","options_spx","surface_spy","surface_spx","extended_spy","extended_spx","all"])
+    p.add_argument(
+    "task",
+    choices=[
+        "validate","market",
+        "options_spy","options_spx",
+        "surface_spy","surface_spx",
+        "extended_spy","extended_spx",
+        "all"
+    ]
+)
     args = p.parse_args()
 
     if args.task in {"validate","all"}: validate_raw()

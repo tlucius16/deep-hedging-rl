@@ -66,7 +66,7 @@ def read_csv_flexible(
     parse_first: bool = True,
     skiprows: int = 0,
 ) -> pd.DataFrame:
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, skiprows=skiprows)
     dcol = _find_date_col(df, date_cols)
     vcol = _find_value_col(df, value_cols)
     out = df[[dcol, vcol]].rename(columns={dcol: "date", vcol: "value"})
@@ -99,9 +99,7 @@ def ensure_materialized(path: Path):
         raise FileNotFoundError(f"Missing file: {path}")
     if is_lfs_pointer(path):
         raise RuntimeError(
-            f"{path.name} looks like a Git LFS pointer.\n"
+            f"{path.name} is a Git LFS pointer, not the data.\n"
             "Run:\n"
             "  git lfs install\n"
-            "  git lfs pull\n"
-            "…then re-run."
-        )
+            "  git lfs pull\n")

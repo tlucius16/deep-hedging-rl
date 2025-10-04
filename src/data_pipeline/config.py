@@ -12,9 +12,14 @@ ROOT = _repo_root()
 
 RAW_DIR       = ROOT / "data" / "ProjectData"   # ⬅️ moved from data/raw
 PROCESSED_DIR = ROOT / "data" / "processed"
-PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+ALIGNED   = PROCESSED_DIR / "aligned"
+ALIGNED_SPX  = ALIGNED /  "spx"
+ALIGNED_SPY  = ALIGNED / "spy"
+CLEANED   = PROCESSED_DIR / "cleaned"
 
-# exactly what’s in your screenshot
+for d in (PROCESSED_DIR, ALIGNED, CLEANED):
+    d.mkdir(parents=True, exist_ok=True)
+
 FILENAMES = {
     "dgs10":                "DGS10.csv",
     "vix":                  "VIXCLS.csv",

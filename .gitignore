@@ -213,6 +213,7 @@ __marimo__/
 
 # Raw Bloomberg/WRDS data (never commit)
 data/raw/
+data/processed/options_parquet/
 
 # Large experiment logs & outputs
 experiments/logs/
@@ -220,5 +221,5 @@ wandb/
 mlruns/
 
 # Allow small processed demo datasets
-!data/processed/
+!data/processed/cleaned/
 !data/ProjectData/

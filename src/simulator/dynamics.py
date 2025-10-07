@@ -1,17 +1,28 @@
+# dynamics.py
 from __future__ import annotations
+import pandas as pd
 import numpy as np
+from typing import Tuple, Sequence
 
-def gbm_paths(s0: float, mu: float, sigma: float, dt: float, n_steps: int, n_paths: int, seed: int | None = None):
+def ensure_ret_fwd(df: pd.DataFrame, price_col: str) -> pd.Series:
     """
-    Simple GBM path generator.
-    Returns array shape (n_steps+1, n_paths) with first row = s0.
+    Utility for upstream use (optional): compute forward return from a price column.
+    Not used by the env directly (env expects 'ret_fwd' to be present).
     """
-    rng = np.random.default_rng(seed)
-    s = np.zeros((n_steps + 1, n_paths), dtype=float)
-    s[0, :] = s0
-    drift = (mu - 0.5 * sigma**2) * dt
-    vol = sigma * np.sqrt(dt)
-    z = rng.standard_normal(size=(n_steps, n_paths))
-    for t in range(n_steps):
-        s[t + 1, :] = s[t, :] * np.exp(drift + vol * z[t, :])
-    return s
+    px = pd.to_numeric(df[price_col], errors="coerce")
+    r = px.pct_change().shift(-1)
+    return r
+
+def basic_dynamics_view(df: pd.DataFrame, features: Sequence[str]) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    If you want to precompute (X, R) outside the env:
+      returns feature matrix X and forward returns R from df[features + 'ret_fwd'].
+    """
+    req = list(features) + ["ret_fwd"]
+    missing = [c for c in req if c not in df.columns]
+    if missing:
+        raise KeyError(f"dynamics.basic_dynamics_view: missing {missing}")
+    g = df.dropna(subset=["ret_fwd"])
+    X = g[features].values.astype(float)
+    R = g["ret_fwd"].values.astype(float)
+    return X, R

@@ -12,15 +12,12 @@ ROOT = _repo_root()
 
 RAW_DIR       = ROOT / "data" / "ProjectData"   # ⬅️ moved from data/raw
 PROCESSED_DIR = ROOT / "data" / "processed"
-ALIGNED   = PROCESSED_DIR / "aligned"
-ALIGNED_SPX  = ALIGNED /  "spx"
-ALIGNED_SPY  = ALIGNED / "spy"
 CLEANED   = PROCESSED_DIR / "cleaned"
 RAW_OPT = ROOT / "data" / "raw" 
 RAW_SPX = RAW_OPT / "options_spx"
 RAW_SPY = RAW_OPT / "options_spy"
 
-for d in (PROCESSED_DIR, ALIGNED, CLEANED, ALIGNED_SPX, ALIGNED_SPY):
+for d in (PROCESSED_DIR, CLEANED, RAW_DIR, RAW_OPT, RAW_SPX, RAW_SPY):
     d.mkdir(parents=True, exist_ok=True)
 
 FILENAMES = {

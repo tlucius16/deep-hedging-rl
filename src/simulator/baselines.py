@@ -23,19 +23,26 @@ def momentum_policy(feature_idx: int = 0, k: float = 1.0) -> Callable[[np.ndarra
 
 def volatility_targeting(feature_idx: int = 0, ann_vol_target: float = 0.15) -> Callable[[np.ndarray], float]:
     """
-    Hedge size inversely proportional to recent annualized vol of selected feature (proxy).
+    Hedge size inversely proportional to recent realized volatility of the selected feature.
+    - If realized vol > target → increase hedge (reduce exposure).
+    - If realized vol < target → decrease hedge (take more exposure).
     """
     def policy(obs: np.ndarray) -> float:
         x = obs[:, feature_idx]
-        if len(x) < 2:
+        if len(x) < 5:  # at least a few obs for stdev
             return 0.0
         r = np.diff(np.log(np.clip(x, 1e-12, None)))
-        vol = r.std(ddof=1) * np.sqrt(252.0)
-        if vol == 0 or np.isnan(vol):
+        vol = np.nanstd(r, ddof=1) * np.sqrt(252.0)
+        if vol <= 1e-6 or np.isnan(vol):
             return 0.0
-        w = ann_vol_target / vol
-        return float(np.clip(w, -1.0, 1.0))
+
+        # Hedge fraction = 1 - (target_vol / realized_vol)
+        # → if vol > target → hedge up (approach 1)
+        # → if vol < target → hedge down (approach 0)
+        h = 1.0 - (ann_vol_target / vol)
+        return float(np.clip(h, -1.0, 1.0))  # hedge ratio bounded
     return policy
+
 
 def delta_hedge_policy(delta_fn: Callable[[np.ndarray], float], scale: float = 1.0) -> Callable[[np.ndarray], float]:
     """

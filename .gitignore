@@ -214,6 +214,8 @@ __marimo__/
 # Raw Bloomberg/WRDS data (never commit)
 data/raw/
 data/processed/options_parquet/
+data/processed/cleaned/SPY/
+data/processed/cleaned/SPX/
 
 # Large experiment logs & outputs
 experiments/logs/
